@@ -1,0 +1,16 @@
+{
+  "name": "djmax-bot",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "repository": "https://github.com/Alanimdeo/DJMAX-bot",
+  "author": "Alanimdeo",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.1.4",
+    "intercept-stdout": "^0.1.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.3"
+  }
+}
