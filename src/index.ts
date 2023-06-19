@@ -1,6 +1,7 @@
 console.log(`봇 로딩 중... 가동 시각: ${new Date().toLocaleString()}\n모듈 로딩 중...`);
-import { EmbedBuilder, GatewayIntentBits, Message } from "discord.js";
 import { readdirSync, readFileSync } from "fs";
+import { EmbedBuilder, GatewayIntentBits, Message } from "discord.js";
+import { secretChatHandler } from "./modules/secretChat";
 import { Bot, Command, Config } from "./types";
 
 console.log("설정 불러오는 중...");
@@ -93,6 +94,11 @@ bot.on("messageCreate", async (message: Message) => {
   const secretChatChannelIds = secretChat.map((secretChat) => secretChat.channelId);
 
   if (config.admins.includes(message.author.id)) {
+    if (message.content === `${config.adminPrefix} quit`) {
+      await message.react("✅");
+      exit();
+      return;
+    }
     const command = bot.adminCommands.get(message.content.split(" ")[1]);
     if (command) {
       await command.execute(message, bot);
@@ -101,37 +107,7 @@ bot.on("messageCreate", async (message: Message) => {
 
   if (secretChatChannelIds.includes(message.channelId)) {
     const channel = secretChat.find((channel) => channel.channelId === message.channelId)!;
-    setTimeout(async () => {
-      try {
-        await message.delete();
-      } catch (_) {
-        // Do nothing!
-      }
-    }, channel.duration);
-    if (!channel.logChannelId) {
-      return;
-    }
-    const logChannel = bot.guilds.cache.get(channel.guildId)?.channels.cache.get(channel.logChannelId);
-    if (!logChannel || !logChannel.isTextBased()) {
-      return;
-    }
-    const embed = new EmbedBuilder();
-    if (message.member?.displayName) {
-      embed.setAuthor({
-        name: message.member.displayName,
-        iconURL: message.author.avatarURL() ?? undefined,
-      });
-    }
-    if (message.content.length !== 0) {
-      embed.setDescription(message.content);
-    }
-    embed.setTimestamp(message.createdAt);
-
-    const files = Array.from(message.attachments.values());
-    await logChannel.send({
-      files,
-      embeds: [embed],
-    });
+    secretChatHandler(bot, message, channel);
   }
 });
 
