@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 console.log(`봇 로딩 중... 가동 시각: ${new Date().toLocaleString()}\n모듈 로딩 중...`);
-const discord_js_1 = require("discord.js");
 const fs_1 = require("fs");
+const discord_js_1 = require("discord.js");
+const secretChat_1 = require("./modules/secretChat");
 const types_1 = require("./types");
 console.log("설정 불러오는 중...");
 let config;
@@ -85,6 +86,11 @@ bot.on("messageCreate", async (message) => {
     const secretChat = bot.config.get("secretChat");
     const secretChatChannelIds = secretChat.map((secretChat) => secretChat.channelId);
     if (config.admins.includes(message.author.id)) {
+        if (message.content === `${config.adminPrefix} quit`) {
+            await message.react("✅");
+            exit();
+            return;
+        }
         const command = bot.adminCommands.get(message.content.split(" ")[1]);
         if (command) {
             await command.execute(message, bot);
@@ -92,37 +98,7 @@ bot.on("messageCreate", async (message) => {
     }
     if (secretChatChannelIds.includes(message.channelId)) {
         const channel = secretChat.find((channel) => channel.channelId === message.channelId);
-        setTimeout(async () => {
-            try {
-                await message.delete();
-            }
-            catch (_) {
-                // Do nothing!
-            }
-        }, channel.duration);
-        if (!channel.logChannelId) {
-            return;
-        }
-        const logChannel = bot.guilds.cache.get(channel.guildId)?.channels.cache.get(channel.logChannelId);
-        if (!logChannel || !logChannel.isTextBased()) {
-            return;
-        }
-        const embed = new discord_js_1.EmbedBuilder();
-        if (message.member?.displayName) {
-            embed.setAuthor({
-                name: message.member.displayName,
-                iconURL: message.author.avatarURL() ?? undefined,
-            });
-        }
-        if (message.content.length !== 0) {
-            embed.setDescription(message.content);
-        }
-        embed.setTimestamp(message.createdAt);
-        const files = Array.from(message.attachments.values());
-        await logChannel.send({
-            files,
-            embeds: [embed],
-        });
+        (0, secretChat_1.secretChatHandler)(bot, message, channel);
     }
 });
 console.log("로그인 중...");
