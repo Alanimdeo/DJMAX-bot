@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from "fs";
 import { EmbedBuilder, GatewayIntentBits, Message } from "discord.js";
 import { secretChatHandler } from "./modules/secretChat";
 import { Bot, Command, Config } from "./types";
+import { banStickersHandler } from "./modules/banStickers";
 
 console.log("설정 불러오는 중...");
 let config: Config;
@@ -14,6 +15,7 @@ function loadConfig(path: string = "."): Config {
       throw new Error("잘못된 설정 파일입니다.");
     }
     configFile.admins = configFile.admins.map((admin: string | number) => String(admin));
+    configFile.banStickers.names = configFile.banStickers.names.map((name: string) => new RegExp(name));
     return configFile as Config;
   } catch (err: any) {
     if (err?.code === "ENOENT" && path === ".") {
@@ -108,6 +110,11 @@ bot.on("messageCreate", async (message: Message) => {
   if (secretChatChannelIds.includes(message.channelId)) {
     const channel = secretChat.find((channel) => channel.channelId === message.channelId)!;
     secretChatHandler(bot, message, channel);
+  }
+
+  if (message.stickers.size > 0) {
+    console.log(message.stickers);
+    banStickersHandler(bot, message, config.banStickers);
   }
 });
 

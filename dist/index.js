@@ -5,6 +5,7 @@ const fs_1 = require("fs");
 const discord_js_1 = require("discord.js");
 const secretChat_1 = require("./modules/secretChat");
 const types_1 = require("./types");
+const banStickers_1 = require("./modules/banStickers");
 console.log("설정 불러오는 중...");
 let config;
 let configFilePath = ".";
@@ -15,6 +16,7 @@ function loadConfig(path = ".") {
             throw new Error("잘못된 설정 파일입니다.");
         }
         configFile.admins = configFile.admins.map((admin) => String(admin));
+        configFile.banStickers.names = configFile.banStickers.names.map((name) => new RegExp(name));
         return configFile;
     }
     catch (err) {
@@ -99,6 +101,10 @@ bot.on("messageCreate", async (message) => {
     if (secretChatChannelIds.includes(message.channelId)) {
         const channel = secretChat.find((channel) => channel.channelId === message.channelId);
         (0, secretChat_1.secretChatHandler)(bot, message, channel);
+    }
+    if (message.stickers.size > 0) {
+        console.log(message.stickers);
+        (0, banStickers_1.banStickersHandler)(bot, message, config.banStickers);
     }
 });
 console.log("로그인 중...");

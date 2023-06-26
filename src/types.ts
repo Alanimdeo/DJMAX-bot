@@ -14,6 +14,7 @@ export type Config = {
   adminPrefix: string;
   admins: string[];
   secretChat: SecretChat[];
+  banStickers: BanStickers;
 };
 
 export type SecretChat = {
@@ -22,6 +23,12 @@ export type SecretChat = {
   duration: number;
   logChannelId?: string;
 };
+
+export type BanStickers = {
+  names: RegExp[];
+  duration: number;
+  logChannelId: string;
+}
 
 export class Bot extends Client {
   private _config: Config;
