@@ -28,12 +28,13 @@ export type BanStickers = {
   names: RegExp[];
   duration: number;
   logChannelId: string;
-}
+};
 
 export class Bot extends Client {
   private _config: Config;
   private _configFilePath: string;
   config: {
+    getAll: () => Config;
     get: <T extends keyof Config>(key: T) => Config[T];
     set: <T extends keyof Config>(key: T, value: Config[T]) => void;
   };
@@ -45,12 +46,23 @@ export class Bot extends Client {
     this._config = config;
     this._configFilePath = configFilePath;
     this.config = {
+      getAll: () => {
+        return this._config;
+      },
       get: <T extends keyof Config>(key: T) => {
         return this._config[key];
       },
       set: <T extends keyof Config>(key: T, value: Config[T]) => {
-        this._config[key] = value;
-        writeFileSync(path.join(this._configFilePath, "config.json"), JSON.stringify(this._config, null, 2));
+        const config: any = Object.assign({}, this._config);
+        if (key === "banStickers") {
+          this._config[key] = value;
+          config[key] = Object.assign({}, value);
+          config.banStickers.names = (value as BanStickers).names.map((name: RegExp) => name.source);
+        } else {
+          this._config[key] = value;
+          config[key] = value;
+        }
+        writeFileSync(path.join(this._configFilePath, "config.json"), JSON.stringify(config, null, 2));
       },
     };
     this.commands = new Collection<string, Command>();

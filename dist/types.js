@@ -18,12 +18,24 @@ class Bot extends discord_js_1.Client {
         this._config = config;
         this._configFilePath = configFilePath;
         this.config = {
+            getAll: () => {
+                return this._config;
+            },
             get: (key) => {
                 return this._config[key];
             },
             set: (key, value) => {
-                this._config[key] = value;
-                (0, fs_1.writeFileSync)(path_1.default.join(this._configFilePath, "config.json"), JSON.stringify(this._config, null, 2));
+                const config = Object.assign({}, this._config);
+                if (key === "banStickers") {
+                    this._config[key] = value;
+                    config[key] = Object.assign({}, value);
+                    config.banStickers.names = value.names.map((name) => name.source);
+                }
+                else {
+                    this._config[key] = value;
+                    config[key] = value;
+                }
+                (0, fs_1.writeFileSync)(path_1.default.join(this._configFilePath, "config.json"), JSON.stringify(config, null, 2));
             },
         };
         this.commands = new discord_js_1.Collection();

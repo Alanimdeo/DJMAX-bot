@@ -113,7 +113,6 @@ bot.on("messageCreate", async (message: Message) => {
   }
 
   if (message.stickers.size > 0) {
-    console.log(message.stickers);
     banStickersHandler(bot, message, config.banStickers);
   }
 });
@@ -123,24 +122,26 @@ bot.login(config.token);
 
 async function exit() {
   console.log("종료 중...");
-  const secretChat = bot.config.get("secretChat");
-  for (const channel of secretChat) {
-    const guild = bot.guilds.cache.get(channel.guildId);
-    if (!guild) {
-      continue;
+  if (process.env.NODE_ENV === "production") {
+    const secretChat = bot.config.get("secretChat");
+    for (const channel of secretChat) {
+      const guild = bot.guilds.cache.get(channel.guildId);
+      if (!guild) {
+        continue;
+      }
+      const chatChannel = guild.channels.cache.get(channel.channelId);
+      if (!chatChannel || !chatChannel.isTextBased()) {
+        continue;
+      }
+      await chatChannel.send({
+        embeds: [
+          new EmbedBuilder()
+            .setColor("#ff0000")
+            .setTitle(":warning: 봇이 가동 중이지 않습니다.")
+            .setDescription("지금 치는 채팅은 삭제되지 않고, 다음 봇 가동 시에 일괄 삭제됩니다. 주의하세요!"),
+        ],
+      });
     }
-    const chatChannel = guild.channels.cache.get(channel.channelId);
-    if (!chatChannel || !chatChannel.isTextBased()) {
-      continue;
-    }
-    await chatChannel.send({
-      embeds: [
-        new EmbedBuilder()
-          .setColor("#ff0000")
-          .setTitle(":warning: 봇이 가동 중이지 않습니다.")
-          .setDescription("지금 치는 채팅은 삭제되지 않고, 다음 봇 가동 시에 일괄 삭제됩니다. 주의하세요!"),
-      ],
-    });
   }
   bot.user?.setStatus("invisible");
   bot.destroy();

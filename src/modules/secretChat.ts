@@ -20,6 +20,8 @@ export async function secretChatHandler(bot: Bot, message: Message, secretChat: 
   await logChannel.send({
     files: Array.from(message.attachments.values()),
     embeds: Array.from(message.embeds.values()),
-    content: `**${message.member?.nickname || message.author.username}**(${message.author.id}) > ${message.content}${message.stickers.size ? "Sticker: [" + message.stickers.map((sticker) => sticker.name).join(", ") + "]" : ""}`,
+    content: `**${message.member?.nickname || message.author.username}**(${message.author.id}) > ${message.content}${
+      message.stickers.size ? "Sticker: [" + message.stickers.map((sticker) => sticker.name).join(", ") + "]" : ""
+    }`,
   });
 }
