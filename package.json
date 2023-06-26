@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "run-p -l bot tsc",
     "tsc": "tsc -w",
-    "bot": "nodemon --watch 'dist' dist/index.js"
+    "bot": "NODE_ENV=development nodemon --watch 'dist' dist/index.js"
   },
   "dependencies": {
     "discord-api-types": "^0.37.45",

@@ -122,7 +122,7 @@ bot.login(config.token);
 
 async function exit() {
   console.log("종료 중...");
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV !== "development") {
     const secretChat = bot.config.get("secretChat");
     for (const channel of secretChat) {
       const guild = bot.guilds.cache.get(channel.guildId);
