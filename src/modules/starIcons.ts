@@ -1,13 +1,7 @@
-export const starIcons = {
-  "5": ":star_5:",
-  "10": ":star_10:",
-  "15": ":star_15:",
-  SC5: ":star_sc5:",
-  SC10: ":star_sc10:",
-  SC15: ":star_sc15:",
-};
+import { Bot } from "../types";
 
-export function starIcon(level: number, SC: boolean = false) {
+export function starIcon(bot: Bot, level: number, SC: boolean = false) {
+  const starIcons = bot.config.get("starIcons");
   let color: "5" | "10" | "15";
 
   if (level > 10) {

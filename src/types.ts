@@ -15,6 +15,14 @@ export type Config = {
   admins: string[];
   secretChat: SecretChat[];
   logChannelId?: string;
+  starIcons: {
+    "5": string;
+    "10": string;
+    "15": string;
+    SC5: string;
+    SC10: string;
+    SC15: string;
+  };
 };
 
 export type SecretChat = {

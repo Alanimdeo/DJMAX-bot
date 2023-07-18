@@ -66,26 +66,26 @@ module.exports = new Command(
               name: "4B TUNES",
               value: `\` NORMAL\`: ${
                 song.patterns["4B"]["NM"]
-                  ? starIcon(song.patterns["4B"]["NM"].level) + song.patterns["4B"]["NM"].level
+                  ? starIcon(bot, song.patterns["4B"]["NM"].level) + song.patterns["4B"]["NM"].level
                   : "-"
               }
 \`   HARD\`: ${
                 song.patterns["4B"]["HD"]
-                  ? starIcon(song.patterns["4B"]["HD"].level) +
+                  ? starIcon(bot, song.patterns["4B"]["HD"].level) +
                     song.patterns["4B"]["HD"].level +
                     ("floor" in song.patterns["4B"]["HD"] ? " (" + song.patterns["4B"]["HD"].floor + ")" : "")
                   : "-"
               }
 \`MAXIMUM\`: ${
                 song.patterns["4B"]["MX"]
-                  ? starIcon(song.patterns["4B"]["MX"].level) +
+                  ? starIcon(bot, song.patterns["4B"]["MX"].level) +
                     song.patterns["4B"]["MX"].level +
                     ("floor" in song.patterns["4B"]["MX"] ? " (" + song.patterns["4B"]["MX"].floor + ")" : "")
                   : "-"
               }
 \`     SC\`: ${
                 song.patterns["4B"]["SC"]
-                  ? starIcon(song.patterns["4B"]["SC"].level, true) +
+                  ? starIcon(bot, song.patterns["4B"]["SC"].level, true) +
                     song.patterns["4B"]["SC"].level +
                     ("floor" in song.patterns["4B"]["SC"] ? " (" + song.patterns["4B"]["SC"].floor + ")" : "")
                   : "-"
@@ -95,26 +95,26 @@ module.exports = new Command(
               name: "5B TUNES",
               value: `\` NORMAL\`: ${
                 song.patterns["5B"]["NM"]
-                  ? starIcon(song.patterns["5B"]["NM"].level) + song.patterns["5B"]["NM"].level
+                  ? starIcon(bot, song.patterns["5B"]["NM"].level) + song.patterns["5B"]["NM"].level
                   : "-"
               }
 \`   HARD\`: ${
                 song.patterns["5B"]["HD"]
-                  ? starIcon(song.patterns["5B"]["HD"].level) +
+                  ? starIcon(bot, song.patterns["5B"]["HD"].level) +
                     song.patterns["5B"]["HD"].level +
                     ("floor" in song.patterns["5B"]["HD"] ? " (" + song.patterns["5B"]["HD"].floor + ")" : "")
                   : "-"
               }
 \`MAXIMUM\`: ${
                 song.patterns["5B"]["MX"]
-                  ? starIcon(song.patterns["5B"]["MX"].level) +
+                  ? starIcon(bot, song.patterns["5B"]["MX"].level) +
                     song.patterns["5B"]["MX"].level +
                     ("floor" in song.patterns["5B"]["MX"] ? " (" + song.patterns["5B"]["MX"].floor + ")" : "")
                   : "-"
               }
 \`     SC\`: ${
                 song.patterns["5B"]["SC"]
-                  ? starIcon(song.patterns["5B"]["SC"].level, true) +
+                  ? starIcon(bot, song.patterns["5B"]["SC"].level, true) +
                     song.patterns["5B"]["SC"].level +
                     ("floor" in song.patterns["5B"]["SC"] ? " (" + song.patterns["5B"]["SC"].floor + ")" : "")
                   : "-"
@@ -128,26 +128,26 @@ module.exports = new Command(
               name: "6B TUNES",
               value: `\` NORMAL\`: ${
                 song.patterns["6B"]["NM"]
-                  ? starIcon(song.patterns["6B"]["NM"].level) + song.patterns["6B"]["NM"].level
+                  ? starIcon(bot, song.patterns["6B"]["NM"].level) + song.patterns["6B"]["NM"].level
                   : "-"
               }
 \`   HARD\`: ${
                 song.patterns["6B"]["HD"]
-                  ? starIcon(song.patterns["6B"]["HD"].level) +
+                  ? starIcon(bot, song.patterns["6B"]["HD"].level) +
                     song.patterns["6B"]["HD"].level +
                     ("floor" in song.patterns["6B"]["HD"] ? " (" + song.patterns["6B"]["HD"].floor + ")" : "")
                   : "-"
               }
 \`MAXIMUM\`: ${
                 song.patterns["6B"]["MX"]
-                  ? starIcon(song.patterns["6B"]["MX"].level) +
+                  ? starIcon(bot, song.patterns["6B"]["MX"].level) +
                     song.patterns["6B"]["MX"].level +
                     ("floor" in song.patterns["6B"]["MX"] ? " (" + song.patterns["6B"]["MX"].floor + ")" : "")
                   : "-"
               }
 \`     SC\`: ${
                 song.patterns["6B"]["SC"]
-                  ? starIcon(song.patterns["6B"]["SC"].level, true) +
+                  ? starIcon(bot, song.patterns["6B"]["SC"].level, true) +
                     song.patterns["6B"]["SC"].level +
                     ("floor" in song.patterns["6B"]["SC"] ? " (" + song.patterns["6B"]["SC"].floor + ")" : "")
                   : "-"
@@ -157,26 +157,26 @@ module.exports = new Command(
               name: "8B TUNES",
               value: `\` NORMAL\`: ${
                 song.patterns["8B"]["NM"]
-                  ? starIcon(song.patterns["8B"]["NM"].level) + song.patterns["8B"]["NM"].level
+                  ? starIcon(bot, song.patterns["8B"]["NM"].level) + song.patterns["8B"]["NM"].level
                   : "-"
               }
 \`   HARD\`: ${
                 song.patterns["8B"]["HD"]
-                  ? starIcon(song.patterns["8B"]["HD"].level) +
+                  ? starIcon(bot, song.patterns["8B"]["HD"].level) +
                     song.patterns["8B"]["HD"].level +
                     ("floor" in song.patterns["8B"]["HD"] ? " (" + song.patterns["8B"]["HD"].floor + ")" : "")
                   : "-"
               }
 \`MAXIMUM\`: ${
                 song.patterns["8B"]["MX"]
-                  ? starIcon(song.patterns["8B"]["MX"].level) +
+                  ? starIcon(bot, song.patterns["8B"]["MX"].level) +
                     song.patterns["8B"]["MX"].level +
                     ("floor" in song.patterns["8B"]["MX"] ? " (" + song.patterns["8B"]["MX"].floor + ")" : "")
                   : "-"
               }
 \`     SC\`: ${
                 song.patterns["8B"]["SC"]
-                  ? starIcon(song.patterns["8B"]["SC"].level, true) +
+                  ? starIcon(bot, song.patterns["8B"]["SC"].level, true) +
                     song.patterns["8B"]["SC"].level +
                     ("floor" in song.patterns["8B"]["SC"] ? " (" + song.patterns["8B"]["SC"].floor + ")" : "")
                   : "-"

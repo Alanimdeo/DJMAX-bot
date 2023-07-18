@@ -1,15 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.starIcon = exports.starIcons = void 0;
-exports.starIcons = {
-    "5": ":star_5:",
-    "10": ":star_10:",
-    "15": ":star_15:",
-    SC5: ":star_sc5:",
-    SC10: ":star_sc10:",
-    SC15: ":star_sc15:",
-};
-function starIcon(level, SC = false) {
+exports.starIcon = void 0;
+function starIcon(bot, level, SC = false) {
+    const starIcons = bot.config.get("starIcons");
     let color;
     if (level > 10) {
         color = "15";
@@ -20,6 +13,6 @@ function starIcon(level, SC = false) {
     else {
         color = "5";
     }
-    return SC ? exports.starIcons[`SC${color}`] : exports.starIcons[color];
+    return SC ? starIcons[`SC${color}`] : starIcons[color];
 }
 exports.starIcon = starIcon;
