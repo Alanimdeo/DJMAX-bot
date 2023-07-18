@@ -9,10 +9,11 @@ export async function secretChatHandler(bot: Bot, message: Message, secretChat: 
       // Do nothing!
     }
   }, secretChat.duration);
-  if (!secretChat.logChannelId) {
+  const logChannelId = bot.config.get("logChannelId");
+  if (!logChannelId) {
     return;
   }
-  const logChannel = bot.guilds.cache.get(secretChat.guildId)?.channels.cache.get(secretChat.logChannelId);
+  const logChannel = bot.guilds.cache.get(secretChat.guildId)?.channels.cache.get(logChannelId);
   if (!logChannel || !logChannel.isTextBased()) {
     return;
   }

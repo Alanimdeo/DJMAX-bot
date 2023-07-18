@@ -2,8 +2,8 @@ console.log(`봇 로딩 중... 가동 시각: ${new Date().toLocaleString()}\n�
 import { readdirSync, readFileSync } from "fs";
 import { EmbedBuilder, GatewayIntentBits, Message } from "discord.js";
 import { secretChatHandler } from "./modules/secretChat";
-import { Bot, Command, Config } from "./types";
-import { banStickersHandler } from "./modules/banStickers";
+import { Bot, Command, Config, Song, SongSimplified } from "./types";
+import { simplify } from "./modules/simplify";
 
 console.log("설정 불러오는 중...");
 let config: Config;
@@ -15,7 +15,6 @@ function loadConfig(path: string = "."): Config {
       throw new Error("잘못된 설정 파일입니다.");
     }
     configFile.admins = configFile.admins.map((admin: string | number) => String(admin));
-    configFile.banStickers.names = configFile.banStickers.names.map((name: string) => new RegExp(name));
     return configFile as Config;
   } catch (err: any) {
     if (err?.code === "ENOENT" && path === ".") {
@@ -59,6 +58,19 @@ for (const file of adminCommands) {
 }
 
 bot.once("ready", async () => {
+  console.log("서열표 불러오는 중...");
+  const songs: Song[] = await fetch("https://v-archive.net/db/songs.json").then((res) => res.json());
+  bot.songs = songs;
+  bot.songsSimplified = songs.map((song: Song) => {
+    const songSimplified: SongSimplified = Object.assign({}, song);
+    songSimplified.name = simplify(songSimplified.name);
+    songSimplified.composer = simplify(songSimplified.composer);
+    songSimplified.dlc = simplify(songSimplified.dlc);
+    songSimplified.dlcCode = simplify(songSimplified.dlcCode);
+
+    return songSimplified;
+  });
+
   console.log("비밀 채널에 작성된 메시지 삭제 중..");
   const secretChat = bot.config.get("secretChat");
   for (const channel of secretChat) {
@@ -110,10 +122,6 @@ bot.on("messageCreate", async (message: Message) => {
   if (secretChatChannelIds.includes(message.channelId)) {
     const channel = secretChat.find((channel) => channel.channelId === message.channelId)!;
     secretChatHandler(bot, message, channel);
-  }
-
-  if (message.stickers.size > 0) {
-    banStickersHandler(bot, message, config.banStickers);
   }
 });
 

@@ -5,7 +5,7 @@ const fs_1 = require("fs");
 const discord_js_1 = require("discord.js");
 const secretChat_1 = require("./modules/secretChat");
 const types_1 = require("./types");
-const banStickers_1 = require("./modules/banStickers");
+const simplify_1 = require("./modules/simplify");
 console.log("설정 불러오는 중...");
 let config;
 let configFilePath = ".";
@@ -16,7 +16,6 @@ function loadConfig(path = ".") {
             throw new Error("잘못된 설정 파일입니다.");
         }
         configFile.admins = configFile.admins.map((admin) => String(admin));
-        configFile.banStickers.names = configFile.banStickers.names.map((name) => new RegExp(name));
         return configFile;
     }
     catch (err) {
@@ -56,6 +55,17 @@ for (const file of adminCommands) {
     bot.adminCommands.set(command.data.name, command);
 }
 bot.once("ready", async () => {
+    console.log("서열표 불러오는 중...");
+    const songs = await fetch("https://v-archive.net/db/songs.json").then((res) => res.json());
+    bot.songs = songs;
+    bot.songsSimplified = songs.map((song) => {
+        const songSimplified = Object.assign({}, song);
+        songSimplified.name = (0, simplify_1.simplify)(songSimplified.name);
+        songSimplified.composer = (0, simplify_1.simplify)(songSimplified.composer);
+        songSimplified.dlc = (0, simplify_1.simplify)(songSimplified.dlc);
+        songSimplified.dlcCode = (0, simplify_1.simplify)(songSimplified.dlcCode);
+        return songSimplified;
+    });
     console.log("비밀 채널에 작성된 메시지 삭제 중..");
     const secretChat = bot.config.get("secretChat");
     for (const channel of secretChat) {
@@ -102,15 +112,12 @@ bot.on("messageCreate", async (message) => {
         const channel = secretChat.find((channel) => channel.channelId === message.channelId);
         (0, secretChat_1.secretChatHandler)(bot, message, channel);
     }
-    if (message.stickers.size > 0) {
-        (0, banStickers_1.banStickersHandler)(bot, message, config.banStickers);
-    }
 });
 console.log("로그인 중...");
 bot.login(config.token);
 async function exit() {
     console.log("종료 중...");
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV !== "development") {
         const secretChat = bot.config.get("secretChat");
         for (const channel of secretChat) {
             const guild = bot.guilds.cache.get(channel.guildId);

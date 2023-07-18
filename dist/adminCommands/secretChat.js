@@ -13,7 +13,7 @@ module.exports = new types_1.Command(new discord_js_1.SlashCommandBuilder().setN
             return;
         }
         const logChannelId = args.length === 3 ? args[2] : undefined;
-        createSecretChat(args[0], Number(args[1]), logChannelId);
+        createSecretChat(args[0], Number(args[1]));
         await message.react("✅");
     }
     if (subcommand === "delete") {
@@ -24,9 +24,9 @@ module.exports = new types_1.Command(new discord_js_1.SlashCommandBuilder().setN
         deleteSecretChat(args[0]);
         await message.react("✅");
     }
-    function createSecretChat(channelId, duration, logChannelId) {
+    function createSecretChat(channelId, duration) {
         const secretChat = bot.config.get("secretChat");
-        secretChat.push({ guildId: message.guildId, channelId, duration, logChannelId });
+        secretChat.push({ guildId: message.guildId, channelId, duration });
         bot.config.set("secretChat", secretChat);
     }
     function deleteSecretChat(channelId) {

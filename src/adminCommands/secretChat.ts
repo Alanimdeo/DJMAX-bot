@@ -1,5 +1,5 @@
 import { Message, SlashCommandBuilder } from "discord.js";
-import { Bot, Command } from "../types";
+import { Bot, Command, SecretChat } from "../types";
 
 module.exports = new Command(
   new SlashCommandBuilder().setName("secretchat").setDescription("비밀 채팅방"),
@@ -15,7 +15,7 @@ module.exports = new Command(
         return;
       }
       const logChannelId = args.length === 3 ? args[2] : undefined;
-      createSecretChat(args[0], Number(args[1]), logChannelId);
+      createSecretChat(args[0], Number(args[1]));
       await message.react("✅");
     }
     if (subcommand === "delete") {
@@ -27,9 +27,9 @@ module.exports = new Command(
       await message.react("✅");
     }
 
-    function createSecretChat(channelId: string, duration: number, logChannelId?: string) {
+    function createSecretChat(channelId: string, duration: number) {
       const secretChat = bot.config.get("secretChat");
-      secretChat.push({ guildId: message.guildId!, channelId, duration, logChannelId });
+      secretChat.push({ guildId: message.guildId!, channelId, duration });
       bot.config.set("secretChat", secretChat);
     }
 
