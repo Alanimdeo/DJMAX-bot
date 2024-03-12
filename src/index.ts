@@ -106,8 +106,13 @@ bot.on("interactionCreate", async (interaction) => {
 bot.on("messageCreate", async (message: Message) => {
   const secretChat = bot.config.get("secretChat");
   const secretChatChannelIds = secretChat.map((secretChat) => secretChat.channelId);
+  
+  if (secretChatChannelIds.includes(message.channelId)) {
+    const channel = secretChat.find((channel) => channel.channelId === message.channelId)!;
+    secretChatHandler(bot, message, channel);
+  }
 
-  if (config.admins.includes(message.author.id)) {
+  if (config.admins.includes(message.author.id) && message.content.startsWith(config.adminPrefix)) {
     if (message.content === `${config.adminPrefix} quit`) {
       await message.react("✅");
       exit();
@@ -117,11 +122,6 @@ bot.on("messageCreate", async (message: Message) => {
     if (command) {
       await command.execute(message, bot);
     }
-  }
-
-  if (secretChatChannelIds.includes(message.channelId)) {
-    const channel = secretChat.find((channel) => channel.channelId === message.channelId)!;
-    secretChatHandler(bot, message, channel);
   }
 });
 

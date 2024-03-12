@@ -97,7 +97,11 @@ bot.on("interactionCreate", async (interaction) => {
 bot.on("messageCreate", async (message) => {
     const secretChat = bot.config.get("secretChat");
     const secretChatChannelIds = secretChat.map((secretChat) => secretChat.channelId);
-    if (config.admins.includes(message.author.id)) {
+    if (secretChatChannelIds.includes(message.channelId)) {
+        const channel = secretChat.find((channel) => channel.channelId === message.channelId);
+        (0, secretChat_1.secretChatHandler)(bot, message, channel);
+    }
+    if (config.admins.includes(message.author.id) && message.content.startsWith(config.adminPrefix)) {
         if (message.content === `${config.adminPrefix} quit`) {
             await message.react("✅");
             exit();
@@ -107,10 +111,6 @@ bot.on("messageCreate", async (message) => {
         if (command) {
             await command.execute(message, bot);
         }
-    }
-    if (secretChatChannelIds.includes(message.channelId)) {
-        const channel = secretChat.find((channel) => channel.channelId === message.channelId);
-        (0, secretChat_1.secretChatHandler)(bot, message, channel);
     }
 });
 console.log("로그인 중...");
