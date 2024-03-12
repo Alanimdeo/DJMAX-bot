@@ -11,6 +11,7 @@ var DLCNames;
     DLCNames["VE2"] = "V EXTENSION 2";
     DLCNames["VE3"] = "V EXTENSION 3";
     DLCNames["VE4"] = "V EXTENSION 4";
+    DLCNames["VE5"] = "V EXTENSION 5";
     DLCNames["P1"] = "Portable 1";
     DLCNames["P2"] = "Portable 2";
     DLCNames["P3"] = "Portable 3";
@@ -32,6 +33,8 @@ var DLCNames;
     DLCNames["NXN"] = "NEXON";
     DLCNames["MD"] = "Muse Dash";
     DLCNames["EZ2"] = "EZ2ON REBOOT : R";
+    DLCNames["MAP"] = "MAPLESTORY";
+    DLCNames["CP"] = "CLEAR PASS";
 })(DLCNames || (DLCNames = {}));
 module.exports = new types_1.Command(new discord_js_1.SlashCommandBuilder()
     .setName("검색")

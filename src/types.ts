@@ -108,6 +108,7 @@ export type DLCCode =
   | "VE2"
   | "VE3"
   | "VE4"
+  | "VE5"
   | "P1"
   | "P2"
   | "P3"
@@ -128,7 +129,9 @@ export type DLCCode =
   | "ESTI"
   | "NXN"
   | "MD"
-  | "EZ2";
+  | "EZ2"
+  | "MAP"
+  | "CP";
 
 export type DLC =
   | "RESPECT"
@@ -136,6 +139,7 @@ export type DLC =
   | "V EXTENSION 2"
   | "V EXTENSION 3"
   | "V EXTENSION 4"
+  | "V EXTENSION 5"
   | "PORTABLE 1"
   | "PORTABLE 2"
   | "PORTABLE 3"
@@ -147,7 +151,8 @@ export type DLC =
   | "TECHNIKA 2"
   | "TECHNIKA 3"
   | "TECHNIKA T&Q"
-  | "COLLABORATION";
+  | "COLLABORATION"
+  | "CLEAR PASS";
 
 export enum DLCColor {
   "R" = "#f0b405",
@@ -155,6 +160,7 @@ export enum DLCColor {
   "VE2" = "#cb1d40",
   "VE3" = "#7425dd",
   "VE4" = "#c11100",
+  "VE5" = "#fba902",
   "P1" = "#00b4d4",
   "P2" = "#ff6e90",
   "P3" = "#bc5906",
@@ -176,6 +182,8 @@ export enum DLCColor {
   "NXN" = "#c7d644",
   "MD" = "#da3379",
   "EZ2" = "#1ccfe3",
+  "MAP" = "#d84a1e",
+  "CP" = "#ffbc00",
 }
 
 export type Patterns = {
@@ -198,4 +206,5 @@ export type Pattern = {
 
 export type SCPattern = Pattern & {
   floor: number;
+  rating: number;
 };

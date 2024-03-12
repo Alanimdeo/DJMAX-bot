@@ -9,6 +9,7 @@ enum DLCNames {
   "VE2" = "V EXTENSION 2",
   "VE3" = "V EXTENSION 3",
   "VE4" = "V EXTENSION 4",
+  "VE5" = "V EXTENSION 5",
   "P1" = "Portable 1",
   "P2" = "Portable 2",
   "P3" = "Portable 3",
@@ -30,6 +31,8 @@ enum DLCNames {
   "NXN" = "NEXON",
   "MD" = "Muse Dash",
   "EZ2" = "EZ2ON REBOOT : R",
+  "MAP" = "MAPLESTORY",
+  "CP" = "CLEAR PASS",
 }
 
 module.exports = new Command(
