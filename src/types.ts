@@ -44,7 +44,11 @@ export class Bot extends Client {
   songs: Song[];
   songsSimplified: SongSimplified[];
 
-  constructor(configFilePath: string, config: Config, clientOptions: ClientOptions) {
+  constructor(
+    configFilePath: string,
+    config: Config,
+    clientOptions: ClientOptions
+  ) {
     super(clientOptions);
     this._config = config;
     this._configFilePath = configFilePath;
@@ -59,7 +63,10 @@ export class Bot extends Client {
         const config: any = Object.assign({}, this._config);
         this._config[key] = value;
         config[key] = value;
-        writeFileSync(path.join(this._configFilePath, "config.json"), JSON.stringify(config, null, 2));
+        writeFileSync(
+          path.join(this._configFilePath, "config.json"),
+          JSON.stringify(config, null, 2)
+        );
       },
     };
     this.commands = new Collection<string, Command>();
@@ -69,16 +76,18 @@ export class Bot extends Client {
   }
 }
 
-export type CommandExecutable<T = ChatInputCommandInteraction | Message | string[]> = (
-  input: T,
-  bot: Bot
-) => Promise<any>;
+export type CommandExecutable<
+  T = ChatInputCommandInteraction | Message | string[],
+> = (input: T, bot: Bot) => Promise<any>;
 
 export class Command<T = ChatInputCommandInteraction | Message | string[]> {
   data: Omit<SlashCommandBuilder, "addSubcommandGroup" | "addSubcommand">;
   execute: CommandExecutable<T>;
 
-  constructor(data: Omit<SlashCommandBuilder, "addSubcommandGroup" | "addSubcommand">, execute: CommandExecutable<T>) {
+  constructor(
+    data: Omit<SlashCommandBuilder, "addSubcommandGroup" | "addSubcommand">,
+    execute: CommandExecutable<T>
+  ) {
     this.data = data;
     this.execute = execute;
   }
@@ -131,6 +140,7 @@ export type DLCCode =
   | "MD"
   | "EZ2"
   | "MAP"
+  | "FAL"
   | "CP";
 
 export type DLC =
@@ -183,6 +193,7 @@ export enum DLCColor {
   "MD" = "#da3379",
   "EZ2" = "#1ccfe3",
   "MAP" = "#d84a1e",
+  "FAL" = "#8ec765",
   "CP" = "#ffbc00",
 }
 

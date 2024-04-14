@@ -79,5 +79,6 @@ var DLCColor;
     DLCColor["MD"] = "#da3379";
     DLCColor["EZ2"] = "#1ccfe3";
     DLCColor["MAP"] = "#d84a1e";
+    DLCColor["FAL"] = "#8ec765";
     DLCColor["CP"] = "#ffbc00";
 })(DLCColor || (exports.DLCColor = DLCColor = {}));
