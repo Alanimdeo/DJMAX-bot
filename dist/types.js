@@ -3,10 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DLCColor = exports.Command = exports.Bot = void 0;
-const discord_js_1 = require("discord.js");
+exports.DLCColor = exports.DLCNames = exports.Command = exports.Bot = void 0;
 const fs_1 = require("fs");
 const path_1 = __importDefault(require("path"));
+const discord_js_1 = require("discord.js");
+const fuse_js_1 = __importDefault(require("fuse.js"));
 class Bot extends discord_js_1.Client {
     _config;
     _configFilePath;
@@ -14,7 +15,7 @@ class Bot extends discord_js_1.Client {
     commands;
     adminCommands;
     songs;
-    songsSimplified;
+    songsIndexed;
     constructor(configFilePath, config, clientOptions) {
         super(clientOptions);
         this._config = config;
@@ -36,7 +37,7 @@ class Bot extends discord_js_1.Client {
         this.commands = new discord_js_1.Collection();
         this.adminCommands = new discord_js_1.Collection();
         this.songs = [];
-        this.songsSimplified = [];
+        this.songsIndexed = new fuse_js_1.default([]);
     }
 }
 exports.Bot = Bot;
@@ -49,6 +50,41 @@ class Command {
     }
 }
 exports.Command = Command;
+var DLCNames;
+(function (DLCNames) {
+    DLCNames["R"] = "RESPECT";
+    DLCNames["VE"] = "V EXTENSION";
+    DLCNames["VE2"] = "V EXTENSION 2";
+    DLCNames["VE3"] = "V EXTENSION 3";
+    DLCNames["VE4"] = "V EXTENSION 4";
+    DLCNames["VE5"] = "V EXTENSION 5";
+    DLCNames["VL"] = "V LIBERTY";
+    DLCNames["P1"] = "Portable 1";
+    DLCNames["P2"] = "Portable 2";
+    DLCNames["P3"] = "Portable 3";
+    DLCNames["ES"] = "Emotional Sense";
+    DLCNames["TR"] = "Trilogy";
+    DLCNames["BS"] = "Black Square";
+    DLCNames["CE"] = "Clazziquai Edition";
+    DLCNames["T1"] = "TECHNIKA";
+    DLCNames["T2"] = "TECHNIKA 2";
+    DLCNames["T3"] = "TECHNIKA 3";
+    DLCNames["TQ"] = "TECHNIKA TUNE & Q";
+    DLCNames["GG"] = "GUILTY GEAR";
+    DLCNames["GF"] = "GIRLS' FRONTLINE";
+    DLCNames["GC"] = "GROOVE COASTER";
+    DLCNames["DM"] = "Deemo";
+    DLCNames["CY"] = "Cytus";
+    DLCNames["CHU"] = "CHUNITHM";
+    DLCNames["ESTI"] = "ESTIMATE";
+    DLCNames["NXN"] = "NEXON";
+    DLCNames["MD"] = "Muse Dash";
+    DLCNames["EZ2"] = "EZ2ON REBOOT : R";
+    DLCNames["MAP"] = "MAPLESTORY";
+    DLCNames["FAL"] = "NIHON FALCOM";
+    DLCNames["TEK"] = "TEKKEN";
+    DLCNames["CP"] = "CLEAR PASS";
+})(DLCNames || (exports.DLCNames = DLCNames = {}));
 var DLCColor;
 (function (DLCColor) {
     DLCColor["R"] = "#f0b405";
@@ -57,6 +93,7 @@ var DLCColor;
     DLCColor["VE3"] = "#7425dd";
     DLCColor["VE4"] = "#c11100";
     DLCColor["VE5"] = "#fba902";
+    DLCColor["VL"] = "#ee74bf";
     DLCColor["P1"] = "#00b4d4";
     DLCColor["P2"] = "#ff6e90";
     DLCColor["P3"] = "#bc5906";
@@ -80,5 +117,6 @@ var DLCColor;
     DLCColor["EZ2"] = "#1ccfe3";
     DLCColor["MAP"] = "#d84a1e";
     DLCColor["FAL"] = "#8ec765";
+    DLCColor["TEK"] = "#ffffff";
     DLCColor["CP"] = "#ffbc00";
 })(DLCColor || (exports.DLCColor = DLCColor = {}));

@@ -1,9 +1,11 @@
-console.log(`봇 로딩 중... 가동 시각: ${new Date().toLocaleString()}\n모듈 로딩 중...`);
+console.log(
+  `봇 로딩 중... 가동 시각: ${new Date().toLocaleString()}\n모듈 로딩 중...`
+);
 import { readdirSync, readFileSync } from "fs";
 import { EmbedBuilder, GatewayIntentBits, Message } from "discord.js";
+import Fuse from "fuse.js";
 import { secretChatHandler } from "./modules/secretChat";
-import { Bot, Command, Config, Song, SongSimplified } from "./types";
-import { simplify } from "./modules/simplify";
+import { Bot, Command, Config, Song } from "./types";
 
 console.log("설정 불러오는 중...");
 let config: Config;
@@ -11,10 +13,17 @@ let configFilePath = ".";
 function loadConfig(path: string = "."): Config {
   try {
     const configFile = JSON.parse(readFileSync(`${path}/config.json`, "utf-8"));
-    if (!configFile.token || !configFile.adminPrefix || !configFile.admins || !Array.isArray(configFile.admins)) {
+    if (
+      !configFile.token ||
+      !configFile.adminPrefix ||
+      !configFile.admins ||
+      !Array.isArray(configFile.admins)
+    ) {
       throw new Error("잘못된 설정 파일입니다.");
     }
-    configFile.admins = configFile.admins.map((admin: string | number) => String(admin));
+    configFile.admins = configFile.admins.map((admin: string | number) =>
+      String(admin)
+    );
     return configFile as Config;
   } catch (err: any) {
     if (err?.code === "ENOENT" && path === ".") {
@@ -37,11 +46,17 @@ try {
 
 console.log("봇 생성 중...");
 const bot: Bot = new Bot(configFilePath, config, {
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
 });
 
 const path = readdirSync("./").includes("dist") ? "./dist" : ".";
-const commands = readdirSync(`${path}/commands`).filter((file: string) => file.endsWith(".js") || file.endsWith(".ts"));
+const commands = readdirSync(`${path}/commands`).filter(
+  (file: string) => file.endsWith(".js") || file.endsWith(".ts")
+);
 for (const file of commands) {
   const command: Command = require(`./commands/${file}`);
   console.log(`명령어 불러오는 중.. (${command.data.name})`);
@@ -59,29 +74,47 @@ for (const file of adminCommands) {
 
 bot.once("ready", async () => {
   console.log("서열표 불러오는 중...");
-  const songs: Song[] = await fetch("https://v-archive.net/db/songs.json").then((res) => res.json());
+  const songs: Song[] = await fetch("https://v-archive.net/db/songs.json").then(
+    (res) => res.json()
+  );
   bot.songs = songs;
-  bot.songsSimplified = songs.map((song: Song) => {
-    const songSimplified: SongSimplified = Object.assign({}, song);
-    songSimplified.name = simplify(songSimplified.name);
-    songSimplified.composer = simplify(songSimplified.composer);
-    songSimplified.dlc = simplify(songSimplified.dlc);
-    songSimplified.dlcCode = simplify(songSimplified.dlcCode);
+  bot.songsIndexed = new Fuse(
+    songs.map((song) => {
+      const newSong = Object.assign({}, song);
+      newSong.name = newSong.name.replace(/ /g, "").toLowerCase();
+      newSong.composer = newSong.composer.replace(/ /g, "").toLowerCase();
 
-    return songSimplified;
-  });
-
-  console.log("비밀 채널에 작성된 메시지 삭제 중..");
-  const secretChat = bot.config.get("secretChat");
-  for (const channel of secretChat) {
-    const guild = await bot.guilds.fetch(channel.guildId);
-    const secretChannel = await guild.channels.fetch(channel.channelId);
-    if (!secretChannel || !secretChannel.isTextBased()) {
-      continue;
+      return newSong;
+    }),
+    {
+      keys: [
+        "name",
+        {
+          name: "composer",
+          weight: 0.7,
+        },
+        {
+          name: "dlc",
+          weight: 0.8,
+        },
+      ],
+      ignoreLocation: true,
     }
-    const messages = await secretChannel.messages.fetch();
-    for (let i = 0; i < Math.ceil(messages.size / 100) + 1; i += 1) {
-      await secretChannel.bulkDelete(100);
+  );
+
+  const secretChat = bot.config.get("secretChat");
+  if (secretChat) {
+    console.log("비밀 채널에 작성된 메시지 삭제 중..");
+    for (const channel of secretChat) {
+      const guild = await bot.guilds.fetch(channel.guildId);
+      const secretChannel = await guild.channels.fetch(channel.channelId);
+      if (!secretChannel || !secretChannel.isTextBased()) {
+        continue;
+      }
+      const messages = await secretChannel.messages.fetch();
+      for (let i = 0; i < Math.ceil(messages.size / 100) + 1; i += 1) {
+        await secretChannel.bulkDelete(100);
+      }
     }
   }
 
@@ -105,14 +138,23 @@ bot.on("interactionCreate", async (interaction) => {
 
 bot.on("messageCreate", async (message: Message) => {
   const secretChat = bot.config.get("secretChat");
-  const secretChatChannelIds = secretChat.map((secretChat) => secretChat.channelId);
-  
-  if (secretChatChannelIds.includes(message.channelId)) {
-    const channel = secretChat.find((channel) => channel.channelId === message.channelId)!;
-    secretChatHandler(bot, message, channel);
+  if (secretChat) {
+    const secretChatChannelIds = secretChat.map(
+      (secretChat) => secretChat.channelId
+    );
+
+    if (secretChatChannelIds.includes(message.channelId)) {
+      const channel = secretChat.find(
+        (channel) => channel.channelId === message.channelId
+      )!;
+      secretChatHandler(bot, message, channel);
+    }
   }
 
-  if (config.admins.includes(message.author.id) && message.content.startsWith(config.adminPrefix)) {
+  if (
+    config.admins.includes(message.author.id) &&
+    message.content.startsWith(config.adminPrefix)
+  ) {
     if (message.content === `${config.adminPrefix} quit`) {
       await message.react("✅");
       exit();
@@ -130,8 +172,8 @@ bot.login(config.token);
 
 async function exit() {
   console.log("종료 중...");
-  if (process.env.NODE_ENV !== "development") {
-    const secretChat = bot.config.get("secretChat");
+  const secretChat = bot.config.get("secretChat");
+  if (process.env.NODE_ENV !== "development" && secretChat) {
     for (const channel of secretChat) {
       const guild = bot.guilds.cache.get(channel.guildId);
       if (!guild) {
@@ -146,7 +188,9 @@ async function exit() {
           new EmbedBuilder()
             .setColor("#ff0000")
             .setTitle(":warning: 봇이 가동 중이지 않습니다.")
-            .setDescription("지금 치는 채팅은 삭제되지 않고, 다음 봇 가동 시에 일괄 삭제됩니다. 주의하세요!"),
+            .setDescription(
+              "지금 치는 채팅은 삭제되지 않고, 다음 봇 가동 시에 일괄 삭제됩니다. 주의하세요!"
+            ),
         ],
       });
     }

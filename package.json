@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "discord-api-types": "^0.37.45",
-    "discord.js": "^14.11.0"
+    "discord.js": "^14.11.0",
+    "fuse.js": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.3.1",

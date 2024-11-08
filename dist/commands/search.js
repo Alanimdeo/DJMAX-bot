@@ -2,41 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const types_1 = require("../types");
-const simplify_1 = require("../modules/simplify");
 const starIcons_1 = require("../modules/starIcons");
-var DLCNames;
-(function (DLCNames) {
-    DLCNames["R"] = "RESPECT";
-    DLCNames["VE"] = "V EXTENSION";
-    DLCNames["VE2"] = "V EXTENSION 2";
-    DLCNames["VE3"] = "V EXTENSION 3";
-    DLCNames["VE4"] = "V EXTENSION 4";
-    DLCNames["VE5"] = "V EXTENSION 5";
-    DLCNames["P1"] = "Portable 1";
-    DLCNames["P2"] = "Portable 2";
-    DLCNames["P3"] = "Portable 3";
-    DLCNames["ES"] = "Emotional Sense";
-    DLCNames["TR"] = "Trilogy";
-    DLCNames["BS"] = "Black Square";
-    DLCNames["CE"] = "Clazziquai Edition";
-    DLCNames["T1"] = "TECHNIKA";
-    DLCNames["T2"] = "TECHNIKA 2";
-    DLCNames["T3"] = "TECHNIKA 3";
-    DLCNames["TQ"] = "TECHNIKA TUNE & Q";
-    DLCNames["GG"] = "GUILTY GEAR";
-    DLCNames["GF"] = "GIRLS' FRONTLINE";
-    DLCNames["GC"] = "GROOVE COASTER";
-    DLCNames["DM"] = "Deemo";
-    DLCNames["CY"] = "Cytus";
-    DLCNames["CHU"] = "CHUNITHM";
-    DLCNames["ESTI"] = "ESTIMATE";
-    DLCNames["NXN"] = "NEXON";
-    DLCNames["MD"] = "Muse Dash";
-    DLCNames["EZ2"] = "EZ2ON REBOOT : R";
-    DLCNames["MAP"] = "MAPLESTORY";
-    DLCNames["FAL"] = "NIHON FALCOM";
-    DLCNames["CP"] = "CLEAR PASS";
-})(DLCNames || (DLCNames = {}));
 module.exports = new types_1.Command(new discord_js_1.SlashCommandBuilder()
     .setName("검색")
     .setDescription("곡 정보를 검색합니다.")
@@ -46,13 +12,14 @@ module.exports = new types_1.Command(new discord_js_1.SlashCommandBuilder()
     .setRequired(true)), async (message, bot) => {
     await message.deferReply();
     const query = message.options.getString("검색어", true);
-    const bestMatch = findSimilarSong(query, bot.songsSimplified);
-    if (!bestMatch) {
+    const searchResult = bot.songsIndexed.search(query.replace(/ /g, "").toLowerCase());
+    if (searchResult.length === 0) {
         await message.editReply("검색 결과가 없습니다.");
         return;
     }
+    const bestMatch = searchResult[0].item;
     const song = bot.songs.find((song) => song.title === bestMatch.title);
-    const DLCName = DLCNames[song.dlcCode];
+    const DLCName = types_1.DLCNames[song.dlcCode];
     await message.editReply({
         embeds: [
             new discord_js_1.EmbedBuilder()
@@ -185,53 +152,3 @@ module.exports = new types_1.Command(new discord_js_1.SlashCommandBuilder()
         ],
     });
 });
-function findSimilarSong(input, songList) {
-    input = (0, simplify_1.simplify)(input);
-    let bestMatch = null;
-    let bestMatchScore = Infinity;
-    // Iterate through each song in the list
-    for (const song of songList) {
-        // Calculate the Levenshtein distance between the input and the song's fields
-        const nameDistance = levenshteinDistance(input, song.name);
-        const composerDistance = levenshteinDistance(input, song.composer);
-        const dlcDistance = levenshteinDistance(input, DLCNames[song.dlcCode.toUpperCase()]);
-        const dlcCodeDistance = levenshteinDistance(input, song.dlcCode);
-        const nameWeight = 5;
-        const composerWeight = 0.2;
-        const dlcWeight = 0.8;
-        const dlcCodeWeight = 2;
-        // Calculate the average distance
-        const distance = nameDistance * nameWeight +
-            composerDistance * composerWeight +
-            dlcDistance * dlcWeight +
-            dlcCodeDistance * dlcCodeWeight;
-        // Update the best match if a closer match is found
-        if (distance < bestMatchScore) {
-            bestMatch = song;
-            bestMatchScore = distance;
-        }
-    }
-    return bestMatch;
-}
-function levenshteinDistance(a, b) {
-    const distanceMatrix = [];
-    // Initialize the distance matrix
-    for (let i = 0; i <= a.length; i++) {
-        distanceMatrix[i] = [i];
-    }
-    for (let j = 0; j <= b.length; j++) {
-        distanceMatrix[0][j] = j;
-    }
-    // Calculate the distance matrix
-    for (let i = 1; i <= a.length; i++) {
-        for (let j = 1; j <= b.length; j++) {
-            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-            distanceMatrix[i][j] = Math.min(distanceMatrix[i - 1][j] + 1, // deletion
-            distanceMatrix[i][j - 1] + 1, // insertion
-            distanceMatrix[i - 1][j - 1] + cost // substitution
-            );
-        }
-    }
-    // Return the Levenshtein distance between the two strings
-    return distanceMatrix[a.length][b.length];
-}

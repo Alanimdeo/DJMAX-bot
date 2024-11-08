@@ -1,3 +1,5 @@
+import { writeFileSync } from "fs";
+import path from "path";
 import {
   Client,
   ClientOptions,
@@ -6,8 +8,7 @@ import {
   Message,
   SlashCommandBuilder,
 } from "discord.js";
-import { writeFileSync } from "fs";
-import path from "path";
+import Fuse from "fuse.js";
 
 export type Config = {
   token: string;
@@ -42,7 +43,7 @@ export class Bot extends Client {
   commands: Collection<string, Command<ChatInputCommandInteraction>>;
   adminCommands: Collection<string, Command<Message>>;
   songs: Song[];
-  songsSimplified: SongSimplified[];
+  songsIndexed: Fuse<Song>;
 
   constructor(
     configFilePath: string,
@@ -72,7 +73,7 @@ export class Bot extends Client {
     this.commands = new Collection<string, Command>();
     this.adminCommands = new Collection<string, Command>();
     this.songs = [];
-    this.songsSimplified = [];
+    this.songsIndexed = new Fuse([]);
   }
 }
 
@@ -102,54 +103,51 @@ export type Song = {
   patterns: Patterns;
 };
 
-export type SongSimplified = {
-  title: number;
-  name: string;
-  composer: string;
-  dlcCode: string;
-  dlc: string;
-  patterns: Patterns;
-};
+export enum DLCNames {
+  "R" = "RESPECT",
+  "VE" = "V EXTENSION",
+  "VE2" = "V EXTENSION 2",
+  "VE3" = "V EXTENSION 3",
+  "VE4" = "V EXTENSION 4",
+  "VE5" = "V EXTENSION 5",
+  "VL" = "V LIBERTY",
+  "P1" = "Portable 1",
+  "P2" = "Portable 2",
+  "P3" = "Portable 3",
+  "ES" = "Emotional Sense",
+  "TR" = "Trilogy",
+  "BS" = "Black Square",
+  "CE" = "Clazziquai Edition",
+  "T1" = "TECHNIKA",
+  "T2" = "TECHNIKA 2",
+  "T3" = "TECHNIKA 3",
+  "TQ" = "TECHNIKA TUNE & Q",
+  "GG" = "GUILTY GEAR",
+  "GF" = "GIRLS' FRONTLINE",
+  "GC" = "GROOVE COASTER",
+  "DM" = "Deemo",
+  "CY" = "Cytus",
+  "CHU" = "CHUNITHM",
+  "ESTI" = "ESTIMATE",
+  "NXN" = "NEXON",
+  "MD" = "Muse Dash",
+  "EZ2" = "EZ2ON REBOOT : R",
+  "MAP" = "MAPLESTORY",
+  "FAL" = "NIHON FALCOM",
+  "TEK" = "TEKKEN",
+  "CP" = "CLEAR PASS",
+}
 
-export type DLCCode =
-  | "R"
-  | "VE"
-  | "VE2"
-  | "VE3"
-  | "VE4"
-  | "VE5"
-  | "P1"
-  | "P2"
-  | "P3"
-  | "ES"
-  | "TR"
-  | "BS"
-  | "CE"
-  | "T1"
-  | "T2"
-  | "T3"
-  | "TQ"
-  | "GG"
-  | "GF"
-  | "GC"
-  | "DM"
-  | "CY"
-  | "CHU"
-  | "ESTI"
-  | "NXN"
-  | "MD"
-  | "EZ2"
-  | "MAP"
-  | "FAL"
-  | "CP";
+export type DLCCode = keyof typeof DLCNames;
 
-export type DLC =
+export type NonCollabDLC =
   | "RESPECT"
   | "V EXTENSION"
   | "V EXTENSION 2"
   | "V EXTENSION 3"
   | "V EXTENSION 4"
   | "V EXTENSION 5"
+  | "V LIBERTY"
   | "PORTABLE 1"
   | "PORTABLE 2"
   | "PORTABLE 3"
@@ -161,8 +159,26 @@ export type DLC =
   | "TECHNIKA 2"
   | "TECHNIKA 3"
   | "TECHNIKA T&Q"
-  | "COLLABORATION"
   | "CLEAR PASS";
+
+export type CollabDLC =
+  | "GUILTY GEAR"
+  | "GIRLS' FRONTLINE"
+  | "GROOVE COASTER"
+  | "Deemo"
+  | "Cytus"
+  | "CHUNITHM"
+  | "ESTIMATE"
+  | "NEXON"
+  | "Muse Dash"
+  | "EZ2ON REBOOT : R"
+  | "MAPLESTORY"
+  | "NIHON FALCOM"
+  | "TEKKEN";
+
+export type DLC = NonCollabDLC | "COLLABORATION";
+
+export type FullDLC = NonCollabDLC | CollabDLC;
 
 export enum DLCColor {
   "R" = "#f0b405",
@@ -171,6 +187,7 @@ export enum DLCColor {
   "VE3" = "#7425dd",
   "VE4" = "#c11100",
   "VE5" = "#fba902",
+  "VL" = "#ee74bf",
   "P1" = "#00b4d4",
   "P2" = "#ff6e90",
   "P3" = "#bc5906",
@@ -194,6 +211,7 @@ export enum DLCColor {
   "EZ2" = "#1ccfe3",
   "MAP" = "#d84a1e",
   "FAL" = "#8ec765",
+  "TEK" = "#ffffff",
   "CP" = "#ffbc00",
 }
 

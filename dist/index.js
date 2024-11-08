@@ -1,18 +1,24 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 console.log(`봇 로딩 중... 가동 시각: ${new Date().toLocaleString()}\n모듈 로딩 중...`);
 const fs_1 = require("fs");
 const discord_js_1 = require("discord.js");
+const fuse_js_1 = __importDefault(require("fuse.js"));
 const secretChat_1 = require("./modules/secretChat");
 const types_1 = require("./types");
-const simplify_1 = require("./modules/simplify");
 console.log("설정 불러오는 중...");
 let config;
 let configFilePath = ".";
 function loadConfig(path = ".") {
     try {
         const configFile = JSON.parse((0, fs_1.readFileSync)(`${path}/config.json`, "utf-8"));
-        if (!configFile.token || !configFile.adminPrefix || !configFile.admins || !Array.isArray(configFile.admins)) {
+        if (!configFile.token ||
+            !configFile.adminPrefix ||
+            !configFile.admins ||
+            !Array.isArray(configFile.admins)) {
             throw new Error("잘못된 설정 파일입니다.");
         }
         configFile.admins = configFile.admins.map((admin) => String(admin));
@@ -39,7 +45,11 @@ catch (err) {
 }
 console.log("봇 생성 중...");
 const bot = new types_1.Bot(configFilePath, config, {
-    intents: [discord_js_1.GatewayIntentBits.Guilds, discord_js_1.GatewayIntentBits.GuildMessages, discord_js_1.GatewayIntentBits.MessageContent],
+    intents: [
+        discord_js_1.GatewayIntentBits.Guilds,
+        discord_js_1.GatewayIntentBits.GuildMessages,
+        discord_js_1.GatewayIntentBits.MessageContent,
+    ],
 });
 const path = (0, fs_1.readdirSync)("./").includes("dist") ? "./dist" : ".";
 const commands = (0, fs_1.readdirSync)(`${path}/commands`).filter((file) => file.endsWith(".js") || file.endsWith(".ts"));
@@ -58,25 +68,38 @@ bot.once("ready", async () => {
     console.log("서열표 불러오는 중...");
     const songs = await fetch("https://v-archive.net/db/songs.json").then((res) => res.json());
     bot.songs = songs;
-    bot.songsSimplified = songs.map((song) => {
-        const songSimplified = Object.assign({}, song);
-        songSimplified.name = (0, simplify_1.simplify)(songSimplified.name);
-        songSimplified.composer = (0, simplify_1.simplify)(songSimplified.composer);
-        songSimplified.dlc = (0, simplify_1.simplify)(songSimplified.dlc);
-        songSimplified.dlcCode = (0, simplify_1.simplify)(songSimplified.dlcCode);
-        return songSimplified;
+    bot.songsIndexed = new fuse_js_1.default(songs.map((song) => {
+        const newSong = Object.assign({}, song);
+        newSong.name = newSong.name.replace(/ /g, "").toLowerCase();
+        newSong.composer = newSong.composer.replace(/ /g, "").toLowerCase();
+        return newSong;
+    }), {
+        keys: [
+            "name",
+            {
+                name: "composer",
+                weight: 0.7,
+            },
+            {
+                name: "dlc",
+                weight: 0.8,
+            },
+        ],
+        ignoreLocation: true,
     });
-    console.log("비밀 채널에 작성된 메시지 삭제 중..");
     const secretChat = bot.config.get("secretChat");
-    for (const channel of secretChat) {
-        const guild = await bot.guilds.fetch(channel.guildId);
-        const secretChannel = await guild.channels.fetch(channel.channelId);
-        if (!secretChannel || !secretChannel.isTextBased()) {
-            continue;
-        }
-        const messages = await secretChannel.messages.fetch();
-        for (let i = 0; i < Math.ceil(messages.size / 100) + 1; i += 1) {
-            await secretChannel.bulkDelete(100);
+    if (secretChat) {
+        console.log("비밀 채널에 작성된 메시지 삭제 중..");
+        for (const channel of secretChat) {
+            const guild = await bot.guilds.fetch(channel.guildId);
+            const secretChannel = await guild.channels.fetch(channel.channelId);
+            if (!secretChannel || !secretChannel.isTextBased()) {
+                continue;
+            }
+            const messages = await secretChannel.messages.fetch();
+            for (let i = 0; i < Math.ceil(messages.size / 100) + 1; i += 1) {
+                await secretChannel.bulkDelete(100);
+            }
         }
     }
     bot.user?.setStatus("online");
@@ -96,12 +119,15 @@ bot.on("interactionCreate", async (interaction) => {
 });
 bot.on("messageCreate", async (message) => {
     const secretChat = bot.config.get("secretChat");
-    const secretChatChannelIds = secretChat.map((secretChat) => secretChat.channelId);
-    if (secretChatChannelIds.includes(message.channelId)) {
-        const channel = secretChat.find((channel) => channel.channelId === message.channelId);
-        (0, secretChat_1.secretChatHandler)(bot, message, channel);
+    if (secretChat) {
+        const secretChatChannelIds = secretChat.map((secretChat) => secretChat.channelId);
+        if (secretChatChannelIds.includes(message.channelId)) {
+            const channel = secretChat.find((channel) => channel.channelId === message.channelId);
+            (0, secretChat_1.secretChatHandler)(bot, message, channel);
+        }
     }
-    if (config.admins.includes(message.author.id) && message.content.startsWith(config.adminPrefix)) {
+    if (config.admins.includes(message.author.id) &&
+        message.content.startsWith(config.adminPrefix)) {
         if (message.content === `${config.adminPrefix} quit`) {
             await message.react("✅");
             exit();
@@ -117,8 +143,8 @@ console.log("로그인 중...");
 bot.login(config.token);
 async function exit() {
     console.log("종료 중...");
-    if (process.env.NODE_ENV !== "development") {
-        const secretChat = bot.config.get("secretChat");
+    const secretChat = bot.config.get("secretChat");
+    if (process.env.NODE_ENV !== "development" && secretChat) {
         for (const channel of secretChat) {
             const guild = bot.guilds.cache.get(channel.guildId);
             if (!guild) {
