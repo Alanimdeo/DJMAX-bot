@@ -5,7 +5,9 @@ module.exports = new Command(
   new SlashCommandBuilder().setName("secretchat").setDescription("비밀 채팅방"),
   async (message: Message, bot: Bot) => {
     function checkExistingSecretChat(channelId: string) {
-      return bot.config.get("secretChat").some((secretChat) => secretChat.channelId === channelId);
+      return bot.config
+        .get("secretChat")
+        .some((secretChat) => secretChat.channelId === channelId);
     }
 
     let [_, __, subcommand, ...args] = message.content.split(" ");

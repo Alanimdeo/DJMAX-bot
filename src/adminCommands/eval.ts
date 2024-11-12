@@ -9,7 +9,8 @@ module.exports = new Command(
       command.shift();
       command.shift();
       let result = eval(command.join(" "));
-      if (typeof result === "object") result = JSON.stringify(result, undefined, 2);
+      if (typeof result === "object")
+        result = JSON.stringify(result, undefined, 2);
       message.reply("```" + String(result) + "```");
     } catch (err) {
       message.reply("```" + String(err) + "```");
