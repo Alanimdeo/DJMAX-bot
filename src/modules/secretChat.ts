@@ -13,13 +13,15 @@ export async function secretChatHandler(
       // Do nothing!
     }
   }, secretChat.duration);
-  const logChannelId = bot.config.get("logChannelId");
-  if (!logChannelId) {
+
+  const log = secretChat.log;
+  if (!log) {
     return;
   }
+
   const logChannel = bot.guilds.cache
-    .get(secretChat.guildId)
-    ?.channels.cache.get(logChannelId);
+    .get(log.guildId)
+    ?.channels.cache.get(log.channelId);
   if (!logChannel || !logChannel.isTextBased()) {
     return;
   }

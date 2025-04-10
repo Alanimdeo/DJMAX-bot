@@ -74,9 +74,15 @@ for (const file of adminCommands) {
 
 bot.once("ready", async () => {
   console.log("서열표 불러오는 중...");
-  const songs: Song[] = await fetch("https://v-archive.net/db/songs.json").then(
-    (res) => res.json()
-  );
+  let songs: Song[];
+  const customSongs = bot.config.get("customSongs");
+  if (customSongs) {
+    songs = JSON.parse(readFileSync(customSongs, "utf-8"));
+  } else {
+    songs = await fetch("https://v-archive.net/db/songs.json").then((res) =>
+      res.json()
+    );
+  }
   bot.songs = songs;
   bot.songsIndexed = new Fuse(
     songs.map((song) => {
