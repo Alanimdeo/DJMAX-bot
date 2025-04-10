@@ -66,7 +66,14 @@ for (const file of adminCommands) {
 }
 bot.once("ready", async () => {
     console.log("서열표 불러오는 중...");
-    const songs = await fetch("https://v-archive.net/db/songs.json").then((res) => res.json());
+    let songs;
+    const customSongs = bot.config.get("customSongs");
+    if (customSongs) {
+        songs = JSON.parse((0, fs_1.readFileSync)(customSongs, "utf-8"));
+    }
+    else {
+        songs = await fetch("https://v-archive.net/db/songs.json").then((res) => res.json());
+    }
     bot.songs = songs;
     bot.songsIndexed = new fuse_js_1.default(songs.map((song) => {
         const newSong = Object.assign({}, song);

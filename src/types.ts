@@ -15,7 +15,6 @@ export type Config = {
   adminPrefix: string;
   admins: string[];
   secretChat: SecretChat[];
-  logChannelId?: string;
   starIcons: {
     "5": string;
     "10": string;
@@ -24,12 +23,17 @@ export type Config = {
     SC10: string;
     SC15: string;
   };
+  customSongs?: string;
 };
 
 export type SecretChat = {
   guildId: string;
   channelId: string;
   duration: number;
+  log?: {
+    guildId: string;
+    channelId: string;
+  };
 };
 
 export class Bot extends Client {
@@ -111,6 +115,7 @@ export enum DLCNames {
   "VE4" = "V EXTENSION 4",
   "VE5" = "V EXTENSION 5",
   "VL" = "V LIBERTY",
+  "VL2" = "V LIBERTY II",
   "P1" = "Portable 1",
   "P2" = "Portable 2",
   "P3" = "Portable 3",
@@ -122,6 +127,7 @@ export enum DLCNames {
   "T2" = "TECHNIKA 2",
   "T3" = "TECHNIKA 3",
   "TQ" = "TECHNIKA TUNE & Q",
+  "PLI1" = "PLI : 2025",
   "GG" = "GUILTY GEAR",
   "GF" = "GIRLS' FRONTLINE",
   "GC" = "GROOVE COASTER",
@@ -148,6 +154,7 @@ export type NonCollabDLC =
   | "V EXTENSION 4"
   | "V EXTENSION 5"
   | "V LIBERTY"
+  | "V LIBERTY II"
   | "PORTABLE 1"
   | "PORTABLE 2"
   | "PORTABLE 3"
@@ -159,6 +166,7 @@ export type NonCollabDLC =
   | "TECHNIKA 2"
   | "TECHNIKA 3"
   | "TECHNIKA T&Q"
+  | "PLI : 2025"
   | "CLEAR PASS";
 
 export type CollabDLC =
@@ -188,6 +196,7 @@ export enum DLCColor {
   "VE4" = "#c11100",
   "VE5" = "#fba902",
   "VL" = "#ee74bf",
+  "VL2" = "#78cc25",
   "P1" = "#00b4d4",
   "P2" = "#ff6e90",
   "P3" = "#bc5906",
@@ -199,6 +208,7 @@ export enum DLCColor {
   "T2" = "#fb4a6c",
   "T3" = "#5589fc",
   "TQ" = "#0ad900",
+  "PLI1" = "#ffffee",
   "GG" = "#b84f2a",
   "GF" = "#fdb300",
   "GC" = "#84ecfc",

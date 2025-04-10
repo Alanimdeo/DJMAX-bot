@@ -17,9 +17,16 @@ var TierColor;
 })(TierColor || (TierColor = {}));
 module.exports = new types_1.Command(new discord_js_1.SlashCommandBuilder()
     .setName("티어")
-    .setDescription("티어 정보를 검색합니다.")
-    .addStringOption((option) => option.setName("닉네임").setDescription("검색할 닉네임을 입력하세요.").setRequired(true))
-    .addStringOption((option) => option.setName("버튼").setDescription("검색할 버튼을 선택하세요.").setRequired(true).addChoices({
+    .setDescription("V-ARCHIVE 티어 정보를 검색합니다.")
+    .addStringOption((option) => option
+    .setName("닉네임")
+    .setDescription("검색할 닉네임을 입력하세요.")
+    .setRequired(true))
+    .addStringOption((option) => option
+    .setName("버튼")
+    .setDescription("검색할 버튼을 선택하세요.")
+    .setRequired(true)
+    .addChoices({
     name: "4B",
     value: "4",
 }, {
@@ -38,7 +45,12 @@ module.exports = new types_1.Command(new discord_js_1.SlashCommandBuilder()
     const result = await fetch(`https://v-archive.net/api/archive/${nickname}/tier/${button}`).then((res) => res.json());
     if (!result.success) {
         await message.editReply({
-            embeds: [new discord_js_1.EmbedBuilder().setColor("#ff0000").setTitle(":warning: 오류").setDescription(result.message)],
+            embeds: [
+                new discord_js_1.EmbedBuilder()
+                    .setColor("#ff0000")
+                    .setTitle(":warning: 오류")
+                    .setDescription(result.message),
+            ],
         });
         return;
     }
